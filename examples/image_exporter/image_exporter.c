@@ -74,11 +74,11 @@ int main(int argc, char *argv[])
                 
                 if (imTemp.data != NULL)
                 {
-                    UnloadImage(image);
+                    UnloadImage(&image);
                     image = imTemp;
                     
-                    UnloadTexture(texture);
-                    texture = LoadTextureFromImage(image);
+                    UnloadTexture(&texture);
+                    texture = LoadTextureFromImage(&image);
                     
                     imageLoaded = true;
                     pixelFormatActive = image.format - 1;
@@ -182,8 +182,8 @@ int main(int argc, char *argv[])
 
     // De-Initialization
     //--------------------------------------------------------------------------------------
-    UnloadImage(image);
-    UnloadTexture(texture);
+    UnloadImage(&image);
+    UnloadTexture(&texture);
     
     CloseWindow();        // Close window and OpenGL context
     //--------------------------------------------------------------------------------------

@@ -62,7 +62,7 @@ int main()
             if (IsFileExtension(fileDialogState.fileNameText, ".png"))
             {
                 strcpy(fileNameToLoad, TextFormat("%s" PATH_SEPERATOR "%s", fileDialogState.dirPathText, fileDialogState.fileNameText));
-                UnloadTexture(texture);
+                UnloadTexture(&texture);
                 texture = LoadTexture(fileNameToLoad);
             }
 
@@ -102,7 +102,7 @@ int main()
 
     // De-Initialization
     //--------------------------------------------------------------------------------------
-    UnloadTexture(texture);     // Unload texture
+    UnloadTexture(&texture);     // Unload texture
 
     CloseWindow();              // Close window and OpenGL context
     //--------------------------------------------------------------------------------------

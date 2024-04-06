@@ -551,8 +551,8 @@ static void GuiLoadStyleAshes(void)
     font.glyphCount = 189;
 
     // Load texture from image
-    font.texture = LoadTextureFromImage(imFont);
-    UnloadImage(imFont);  // Uncompressed image data can be unloaded from memory
+    font.texture = LoadTextureFromImage(&imFont);
+    UnloadImage(&imFont);  // Uncompressed image data can be unloaded from memory
 
     // Copy char recs data from global fontRecs
     // NOTE: Required to avoid issues if trying to free font

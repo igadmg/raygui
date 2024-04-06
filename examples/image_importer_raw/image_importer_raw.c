@@ -145,8 +145,8 @@ int main()
                 if (format != -1)
                 {
                     Image image = LoadImageRaw(fileNamePath, widthValue, heightValue, format, headerSizeValue);
-                    texture = LoadTextureFromImage(image);
-                    UnloadImage(image);
+                    texture = LoadTextureFromImage(&image);
+                    UnloadImage(&image);
                     
                     importWindowActive = false;
                     btnLoadPressed = false;
@@ -219,7 +219,7 @@ int main()
 
     // De-Initialization
     //--------------------------------------------------------------------------------------
-    if (texture.id != 0) UnloadTexture(texture);
+    if (texture.id != 0) UnloadTexture(&texture);
     
     CloseWindow();        // Close window and OpenGL context
     //--------------------------------------------------------------------------------------

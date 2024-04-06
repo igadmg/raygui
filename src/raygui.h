@@ -2988,7 +2988,7 @@ int GuiSliderPro(Rectangle bounds, const char *textLeft, const char *textRight, 
         if (*value > maxValue) *value = maxValue;
         else if (*value < minValue) *value = minValue;
     }
-    
+
     // Control value change check
     if(oldValue == *value) result = 0;
     else result = 1;
@@ -3990,7 +3990,7 @@ void GuiLoadStyle(const char *fileName)
                         if (fontFileName[0] != '\0')
                         {
                             // In case a font is already loaded and it is not default internal font, unload it
-                            if (font.texture.id != GetFontDefault().texture.id) UnloadTexture(font.texture);
+                            if (font.texture.id != GetFontDefault().texture.id) UnloadTexture(&font.texture);
 
                             if (codepointCount > 0) font = LoadFontEx(TextFormat("%s/%s", GetDirectoryPath(fileName), fontFileName), fontSize, codepoints, codepointCount);
                             else font = LoadFontEx(TextFormat("%s/%s", GetDirectoryPath(fileName), fontFileName), fontSize, NULL, 0);   // Default to 95 standard codepoints
@@ -4132,7 +4132,7 @@ void GuiLoadStyleDefault(void)
     if (guiFont.texture.id != GetFontDefault().texture.id)
     {
         // Unload previous font texture
-        UnloadTexture(guiFont.texture);
+        UnloadTexture(&guiFont.texture);
         RL_FREE(guiFont.recs);
         RL_FREE(guiFont.glyphs);
         guiFont.recs = NULL;
@@ -4397,8 +4397,8 @@ static void GuiLoadStyleFromMemory(const unsigned char *fileData, int dataSize)
                 fileDataPtr += fontImageUncompSize;
             }
 
-            if (font.texture.id != GetFontDefault().texture.id) UnloadTexture(font.texture);
-            font.texture = LoadTextureFromImage(imFont);
+            if (font.texture.id != GetFontDefault().texture.id) UnloadTexture(&font.texture);
+            font.texture = LoadTextureFromImage(&imFont);
 
             RAYGUI_FREE(imFont.data);
 
@@ -4826,7 +4826,7 @@ static void GuiDrawText(const char *text, Rectangle textBounds, int alignment, C
             if (guiFont.glyphs[index].advanceX == 0) glyphWidth = ((float)guiFont.recs[index].width*scaleFactor);
             else glyphWidth = (float)guiFont.glyphs[index].advanceX*scaleFactor;
 
-            // Wrap mode text measuring, to validate if 
+            // Wrap mode text measuring, to validate if
             // it can be drawn or a new line is required
             if (wrapMode == TEXT_WRAP_CHAR)
             {
