@@ -348,7 +348,7 @@
     #define RAYGUI_MALLOC(sz)       malloc(sz)
 #endif
 #ifndef RAYGUI_CALLOC
-    #define RAYGUI_CALLOC(n,sz)     calloc(n,sz)
+    #define RAYGUI_CALLOC(n,sz)     calloc((unsigned int)(n),sz)
 #endif
 #ifndef RAYGUI_FREE
     #define RAYGUI_FREE(p)          free(p)
@@ -1463,6 +1463,7 @@ static void DrawRectangleGradientV(int posX, int posY, int width, int height, Co
 //----------------------------------------------------------------------------------
 static void GuiLoadStyleFromMemory(const unsigned char *fileData, int dataSize);    // Load style from memory (binary only)
 
+static Vector2 GetTextSize(const char *text);                   // Gui get text size using gui font and style
 static int GetTextWidth(const char *text);                      // Gui get text width using gui font and style
 static Rectangle GetTextBounds(int control, Rectangle bounds);  // Get text bounds considering control bounds
 static const char *GetTextIcon(const char *text, int *iconId);  // Get text icon if provided and move text cursor
@@ -4515,8 +4516,8 @@ static void GuiLoadStyleFromMemory(const unsigned char *fileData, int dataSize)
     }
 }
 
-// Gui get text width considering icon
-static int GetTextWidth(const char *text)
+// Gui get text size using gui font and style
+static Vector2 GetTextSize(const char *text)
 {
     #if !defined(ICON_TEXT_PADDING)
         #define ICON_TEXT_PADDING   4
@@ -4574,7 +4575,13 @@ static int GetTextWidth(const char *text)
         if (textIconOffset > 0) textSize.x += (RAYGUI_ICON_SIZE - ICON_TEXT_PADDING);
     }
 
-    return (int)textSize.x;
+    return textSize;
+}
+
+// Gui get text width considering icon
+static int GetTextWidth(const char *text)
+{
+    return (int)GetTextSize(text).x;
 }
 
 // Get text bounds considering control bounds
