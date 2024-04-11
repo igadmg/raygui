@@ -26,7 +26,7 @@
 *   NOTES:
 *       - WARNING: GuiLoadStyle() and GuiLoadStyle{Custom}() functions, allocate memory for
 *         font atlas recs and glyphs, freeing that memory is (usually) up to the user,
-*         no unload function is explicitly provided... but note that GuiLoadStyleDefaulf() unloads
+*         no unload function is explicitly provided... but note that GuiLoadStyleDefault() unloads
 *         by default any previously loaded font (texture, recs, glyphs).
 *       - Global UI alpha (guiAlpha) is applied inside GuiDrawRectangle() and GuiDrawText() functions
 *
@@ -317,9 +317,9 @@
 #define RAYGUI_H
 
 #define RAYGUI_VERSION_MAJOR 4
-#define RAYGUI_VERSION_MINOR 0
+#define RAYGUI_VERSION_MINOR 1
 #define RAYGUI_VERSION_PATCH 0
-#define RAYGUI_VERSION  "4.0"
+#define RAYGUI_VERSION  "4.1-dev"
 
 #if !defined(RAYGUI_STANDALONE)
     #include "raylib.h"
@@ -1327,7 +1327,7 @@ static unsigned int guiIcons[RAYGUI_ICON_MAX_ICONS*RAYGUI_ICON_DATA_ELEMENTS] = 
     0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,      // ICON_255
 };
 
-// NOTE: We keep a pointer to the icons array, useful to point to other sets if required
+// NOTE: A pointer to current icons array should be defined
 static unsigned int *guiIconsPtr = guiIcons;
 
 #endif      // !RAYGUI_NO_ICONS && !RAYGUI_CUSTOM_ICONS
@@ -3732,9 +3732,9 @@ int GuiMessageBox(Rectangle bounds, const char *title, const char *message, cons
     int textWidth = GetTextWidth(message) + 2;
 
     Rectangle textBounds = { 0 };
-    textBounds.x = bounds.x + bounds.width/2 - textWidth/2;
+    textBounds.x = bounds.x + RAYGUI_MESSAGEBOX_BUTTON_PADDING;
     textBounds.y = bounds.y + RAYGUI_WINDOWBOX_STATUSBAR_HEIGHT + RAYGUI_MESSAGEBOX_BUTTON_PADDING;
-    textBounds.width = (float)textWidth;
+    textBounds.width = bounds.width - RAYGUI_MESSAGEBOX_BUTTON_PADDING*2;
     textBounds.height = bounds.height - RAYGUI_WINDOWBOX_STATUSBAR_HEIGHT - 3*RAYGUI_MESSAGEBOX_BUTTON_PADDING - RAYGUI_MESSAGEBOX_BUTTON_HEIGHT;
 
     // Draw control
@@ -5020,7 +5020,7 @@ static const char **GuiTextSplit(const char *text, char delimiter, int *count, i
             buffer[i] = '\0';   // Set an end of string at this point
 
             counter++;
-            if (counter == RAYGUI_TEXTSPLIT_MAX_ITEMS) break;
+            if (counter > RAYGUI_TEXTSPLIT_MAX_ITEMS) break;
         }
     }
 
@@ -5180,9 +5180,11 @@ static int GuiScrollBar(Rectangle bounds, int value, int minValue, int maxValue)
     if (value > maxValue) value = maxValue;
     if (value < minValue) value = minValue;
 
-    const int valueRange = maxValue - minValue;
+    int valueRange = maxValue - minValue;
+    if (valueRange <= 0) valueRange = 1;
+
     int sliderSize = GuiGetStyle(SCROLLBAR, SCROLL_SLIDER_SIZE);
-    if (sliderSize < 1) sliderSize = 1;
+    if (sliderSize < 1) sliderSize = 1;  // TODO: Consider a minimum slider size
 
     // Calculate rectangles for all of the components
     arrowUpLeft = RAYGUI_CLITERAL(Rectangle){
