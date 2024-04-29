@@ -59,11 +59,14 @@ int main()
 {
     // Initialization
     //---------------------------------------------------------------------------------------
-    const int screenWidth = 960;
-    const int screenHeight = 560;
+    const float screenScale = 2.f;
+    const int screenWidth = 960 * screenScale;
+    const int screenHeight = 560 * screenScale;
 
     InitWindow(screenWidth, screenHeight, "raygui - controls test suite");
     SetExitKey(0);
+
+    GuiSetScale(screenScale);
 
     // GUI controls initialization
     //----------------------------------------------------------------------------------
