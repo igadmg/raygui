@@ -141,7 +141,7 @@
 *           Draw text bounds rectangles for debug
 *
 *   VERSIONS HISTORY:
-*       4.5-dev (Sep-2024)    Current dev version...
+*       4.5-dev (Sep-2024) Current dev version...
 *                         ADDED: guiControlExclusiveMode and guiControlExclusiveRec for exclusive modes
 *                         ADDED: GuiValueBoxFloat()
 *                         ADDED: GuiDropdonwBox() properties: DROPDOWN_ARROW_HIDDEN, DROPDOWN_ROLL_UP
@@ -1047,7 +1047,7 @@ typedef enum {
 #if defined(RAYGUI_IMPLEMENTATION)
 
 #include <ctype.h>              // required for: isspace() [GuiTextBox()]
-#include <stdio.h>              // Required for: FILE, fopen(), fclose(), fprintf(), feof(), fscanf(), vsprintf() [GuiLoadStyle(), GuiLoadIcons()]
+#include <stdio.h>              // Required for: FILE, fopen(), fclose(), fprintf(), feof(), fscanf(), snprintf(), vsprintf() [GuiLoadStyle(), GuiLoadIcons()]
 #include <stdlib.h>             // Required for: malloc(), calloc(), free() [GuiLoadStyle(), GuiLoadIcons()]
 #include <string.h>             // Required for: strlen() [GuiTextBox(), GuiValueBox()], memset(), memcpy()
 #include <stdarg.h>             // Required for: va_list, va_start(), vfprintf(), va_end() [TextFormat()]
@@ -2941,7 +2941,7 @@ int GuiValueBox(Rectangle bounds, const char *text, int *value, int minValue, in
     GuiState state = guiState;
 
     char textValue[RAYGUI_VALUEBOX_MAX_CHARS + 1] = "\0";
-    sprintf(textValue, "%i", *value);
+    snprintf(textValue, sizeof(textValue), "%i", *value);
 
     Rectangle textBounds = { 0 };
     if (text != NULL)
@@ -3057,7 +3057,7 @@ int GuiValueBoxFloat(Rectangle bounds, const char *text, char *textValue, float 
     GuiState state = guiState;
 
     //char textValue[RAYGUI_VALUEBOX_MAX_CHARS + 1] = "\0";
-    //sprintf(textValue, "%2.2f", *value);
+    //snprintf(textValue, sizeof(textValue), "%2.2f", *value);
 
     Rectangle textBounds = {0};
     if (text != NULL)
@@ -4393,7 +4393,7 @@ const char *GuiIconText(int iconId, const char *text)
     if (text != NULL)
     {
         memset(buffer, 0, 1024);
-        sprintf(buffer, "#%03i#", iconId);
+        snprintf(buffer, sizeof(buffer), "#%03i#", iconId);
 
         for (int i = 5; i < 1024; i++)
         {
@@ -4405,7 +4405,7 @@ const char *GuiIconText(int iconId, const char *text)
     }
     else
     {
-        sprintf(iconBuffer, "#%03i#", iconId);
+        snprintf(iconBuffer, sizeof(iconBuffer), "#%03i#", iconId);
 
         return iconBuffer;
     }
@@ -4485,6 +4485,57 @@ char **GuiLoadIcons(const char *fileName, bool loadIconsName)
         }
 
         fclose(rgiFile);
+    }
+
+    return guiIconsName;
+}
+
+// Load icons from memory
+// WARNING: Binary files only
+char **GuiLoadIconsFromMemory(const unsigned char *fileData, size_t dataSize, bool loadIconsName)
+{
+    const unsigned char *ptr = fileData;
+
+    char signature[5] = { 0 };
+    memcpy(signature, ptr, 4);
+    ptr += 4;
+
+    short version = *(short *)ptr;
+    ptr += sizeof(short);
+    short reserved = *(short *)ptr;
+    ptr += sizeof(short);
+    short iconCount = *(short *)ptr;
+    ptr += sizeof(short);
+    short iconSize = *(short *)ptr;
+    ptr += sizeof(short);
+
+    char **guiIconsName = NULL;
+
+    if ((signature[0] == 'r') &&
+        (signature[1] == 'G') &&
+        (signature[2] == 'I') &&
+        (signature[3] == ' '))
+    {
+        if (loadIconsName)
+        {
+            guiIconsName = (char **)RAYGUI_MALLOC(iconCount * sizeof(char *));
+            for (int i = 0; i < iconCount; i++)
+            {
+                guiIconsName[i] = (char *)RAYGUI_MALLOC(RAYGUI_ICON_MAX_NAME_LENGTH);
+                memcpy(guiIconsName[i], ptr, RAYGUI_ICON_MAX_NAME_LENGTH);
+                ptr += RAYGUI_ICON_MAX_NAME_LENGTH;
+            }
+        }
+        else
+        {
+            // Skip icon name data
+            ptr += iconCount * RAYGUI_ICON_MAX_NAME_LENGTH;
+        }
+
+        int iconDataSize = iconCount * (iconSize * iconSize / 32) * sizeof(unsigned int);
+        guiIconsPtr = (unsigned int *)RAYGUI_MALLOC(iconDataSize);
+
+        memcpy(guiIconsPtr, ptr, iconDataSize);
     }
 
     return guiIconsName;
