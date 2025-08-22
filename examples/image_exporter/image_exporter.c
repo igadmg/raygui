@@ -78,7 +78,7 @@ int main(int argc, char *argv[])
                     image = imTemp;
                     
                     UnloadTexture(&texture);
-                    texture = LoadTextureFromImage(&image);
+                    texture = LoadTextureFromImage(image);
                     
                     imageLoaded = true;
                     pixelFormatActive = image.format - 1;

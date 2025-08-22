@@ -592,7 +592,7 @@ static void GuiLoadStyleBluish(void)
     font.glyphCount = 189;
 
     // Load texture from image
-    font.texture = LoadTextureFromImage(&imFont);
+    font.texture = LoadTextureFromImage(imFont);
     UnloadImage(&imFont);  // Uncompressed image data can be unloaded from memory
 
     // Copy char recs data from global fontRecs

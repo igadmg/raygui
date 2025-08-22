@@ -145,7 +145,7 @@ int main()
                 if (format != -1)
                 {
                     Image image = LoadImageRaw(fileNamePath, widthValue, heightValue, format, headerSizeValue);
-                    texture = LoadTextureFromImage(&image);
+                    texture = LoadTextureFromImage(image);
                     UnloadImage(&image);
                     
                     importWindowActive = false;
